@@ -7,6 +7,8 @@ This is a survey based project for CS839 - Data Management for Machine Learning 
 The steps to run the code are the same as in the original repository. The skin dataset is already downloaded and included in the `src` folder.
 In case, a file not found error is observed, please make sure that the file `Skin_NonSkin.txt` is in the same folder as the source code.
 
+**Project Report** - https://github.com/thisisabhash/PrivacyFL/blob/master/CS839_Federated_Learning_Final_Report.pdf
+
 Citation:
 Rajen Bhatt, Abhinav Dhall, 'Skin Segmentation Dataset', UCI Machine Learning Repository
 
