@@ -12,7 +12,6 @@ from warnings import simplefilter
 from datetime import datetime
 from sklearn import metrics
 
-
 from agent import Agent
 from message import Message
 from utils.dp_mechanisms import laplace
@@ -361,7 +360,8 @@ class ClientAgentServerless(Agent):
         return None
 
     def final_statistics(self):
+        print("Agent number: " + str(self.agent_number))
         print("PERSONAL ACCURACY IS {}".format(self.personal_accuracy))
-        print(self.personal_accuracy)
+        #print(self.personal_accuracy)
         print("FEDERATED ACCURACY IS {}".format(self.federated_accuracy))
-        print(self.federated_accuracy)
+        #print(self.federated_accuracy)

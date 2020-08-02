@@ -24,7 +24,7 @@ NUM_SERVERS = 1
 # ITERATIONS: How many iterations to run simulation for
 ITERATIONS = 10
 # LEN_PER_ITERATION: How many datapoints each client gets per iteration (starts at 0). On iteration i, each client has (i+1) * LEN_PER_ITERATION samples
-len_per_iteration = 50  # using equal size datasets for each client in this example
+len_per_iteration = 50 # using equal size datasets for each client in this example
 LENS_PER_ITERATION = {client_name: len_per_iteration for client_name in client_names}
 
 # LEN_TEST: Length of test dataset. Note whole dataset length is 1797
@@ -32,11 +32,12 @@ LEN_TEST = 300
 
 VERBOSITY = 1  # 1 to print out the result of each iteration
 
-"""Dataset Formatting"""
-# When set to True, simulation uses cumulative datasets (i.e., each iteration includes the last), which also affects the way
-# training is done. With cumulative datasets, each iteration each client trains on its dataset from scratch.
-USING_CUMULATIVE = True
+"""Pyspark"""
+# NOTE: As it's currently implemented. Both these should be False to use Algorithm 1. Both these should be True to use Algorithm 2.
+# Not Using cumulative with algorithm 2 means the weights from your previous iterations don't end up getting used.
 
+USING_PYSPARK = False
+USING_CUMULATIVE = True
 
 """Security"""
 # USE_SECURITY: Implements Diffie-Helman key exchange for added security. Slows runtime slightly, but no effect on performance
@@ -64,8 +65,8 @@ mean = 0
 
 """Client Dropout"""
 # CLIENT_DROPOUT: When TRUE, clients drop out of simulation when personal weights are within tolerance of federated weights
-CLIENT_DROPOUT = False
-tolerance = 10.0  # note this value should change depending on whether you are normalizing
+CLIENT_DROPOUT = True
+tolerance = 20.0  # note this value should change depending on whether you are normalizing
 
 """Latency"""
 SIMULATE_LATENCIES = True

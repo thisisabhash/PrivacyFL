@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-
 class Agent(ABC):
     def __init__(self, agent_number, agent_type):
         self.agent_number = agent_number

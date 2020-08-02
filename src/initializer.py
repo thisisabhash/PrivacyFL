@@ -7,13 +7,19 @@ import random
 from client_agent import ClientAgent
 from server_agent import ServerAgent
 from directory import Directory
+from pyspark.sql import SparkSession
 from sklearn.datasets import load_digits
+from sklearn.datasets import load_wine
+from sklearn.datasets import load_breast_cancer
+from sklearn.datasets import load_iris
 
 from utils import data_formatting
 
 from utils.print_config import print_config
 from utils.model_evaluator import ModelEvaluator
 from sklearn.preprocessing import MinMaxScaler
+
+import csv
 
 
 class Initializer:
@@ -26,13 +32,50 @@ class Initializer:
         """
 
         global len_per_iteration
+        if config.USING_PYSPARK:
+            spark = SparkSession.builder.appName('SecureFederatedLearning').getOrCreate()  # initialize spark session
+            spark.sparkContext.setLogLevel("ERROR")  # supress sparks messages
 
-        digits = load_digits()  # using sklearn's MNIST dataset
-        X, y = digits.data, digits.target
+#        digits = load_digits()  # using sklearn's MNIST dataset
+#        X, y = digits.data, digits.target
+#        temp = np.hstack((X,y))
+#        np.random.shuffle(temp)
+#        X = temp[:,:-1]
+#        y = temp[:,-1]
+        
+        #iris = load_iris()
+        #X, y = iris.data, iris.target
+        #print('Training data size: ' + str(len(X)))
+        
+        reader = csv.reader(open("Skin_NonSkin.txt"), delimiter="\t")
+        dataset = []
+        for row in reader:
+            dataset.append(row)
+    
+        dataset = np.array(dataset)
+        np.random.shuffle(dataset)
+        X = dataset[:,:-1]
+        X = X.astype(np.float)
+        y = dataset[:,-1]
+        y = y.astype(np.int)
+        
+#        reader = csv.reader(open("/Users/abhash/Desktop/CS839 Data Management for ML/Project/HCV-Egy-Data.csv"), delimiter=",")
+#        dataset = []
+#        for row in reader:
+#            dataset.append(row)
+#    
+#        dataset = dataset[1:]
+#        dataset = np.array(dataset)
+#        np.random.shuffle(dataset)
+#        X = dataset[:,:-2]
+#        y = dataset[:,-1]
+        
+        #print(X)
+        #print(y)
 
-        scaler = MinMaxScaler()
-        scaler.fit(X)
-        X = scaler.transform(X)
+#        scaler = MinMaxScaler()
+#        scaler.fit(X)
+#        X = scaler.transform(X)
 
         X_train, X_test = X[:-config.LEN_TEST], X[-config.LEN_TEST:]
         y_train, y_test = y[:-config.LEN_TEST], y[-config.LEN_TEST:]
@@ -47,7 +90,7 @@ class Initializer:
         y_train = y_train[:number_of_samples]
 
         client_to_datasets = data_formatting.partition_data(X_train, y_train, config.client_names, iterations,
-                                                            config.LENS_PER_ITERATION, cumulative=config.USING_CUMULATIVE)
+                                                            config.LENS_PER_ITERATION, cumulative=config.USING_CUMULATIVE, pyspark=config.USING_PYSPARK)
 
         #print_config(len_per_iteration=config.LEN_PER_ITERATION)
         print('\n \n \nSTARTING SIMULATION \n \n \n')
@@ -105,4 +148,8 @@ class Initializer:
         server_agent = self.directory.server_agents[server_agent_name]
         server_agent.request_values(num_iterations=num_iterations)
         server_agent.final_statistics()
+        for client_name, client in self.clients.items():
+            print("Client :" + str(client.agent_number))
+            print("Federated accuracy: " + str(client.federated_accuracy))
+            print("Personal accuracy: " + str(client.personal_accuracy))
 

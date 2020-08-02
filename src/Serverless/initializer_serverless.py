@@ -17,6 +17,7 @@ from client_agent_serverless import ClientAgentServerless
 from directory import Directory
 from pyspark.sql import SparkSession
 from sklearn.datasets import load_digits
+from sklearn.datasets import load_breast_cancer
 from directory_serverless import Directory
 
 
@@ -29,7 +30,8 @@ from message import Message
 from utils.print_config import print_config
 from utils.model_evaluator import ModelEvaluator
 
-
+import csv
+from sklearn.preprocessing import MinMaxScaler
 
 def client_computation_caller(inp):
     client_instance, iteration, lock = inp
@@ -49,8 +51,26 @@ class InitializerServerless:
             spark = SparkSession.builder.appName('SecureFederatedLearning').getOrCreate()  # initialize spark session
             spark.sparkContext.setLogLevel("ERROR")  # supress sparks messages
 
-        digits = load_digits()  # using sklearn's MNIST dataset
-        X, y = digits.data, digits.target
+#        digits = load_digits()  # using sklearn's MNIST dataset
+#        X, y = digits.data, digits.target
+        
+        reader = csv.reader(open("Skin_NonSkin.txt"), delimiter="\t")
+        dataset = []
+        for row in reader:
+            dataset.append(row)
+
+        dataset = np.array(dataset)
+        np.random.seed()
+        np.random.shuffle(dataset)
+        dataset = dataset.astype(np.int)
+        X = dataset[:,:-1]
+        X = X.astype(np.float)
+        y = dataset[:,-1]
+        y = y.astype(np.int)
+        
+#        scaler = MinMaxScaler()
+#        scaler.fit(X)
+#        X = scaler.transform(X)
 
         X_train, X_test = X[:-config.LEN_TEST], X[-config.LEN_TEST:]
         y_train, y_test = y[:-config.LEN_TEST], y[-config.LEN_TEST:]
